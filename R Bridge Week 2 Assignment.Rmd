@@ -1,0 +1,52 @@
+---
+title: "R Bridge Week 2 Assignment"
+author: "Kyle Gilde"
+date: "July 20, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Bridge Week 2 Assignment
+
+R has built in functions for choose() and factorial(). Your task is to write your own variation of the choose()
+function, that does not use either of these functions. 
+
+
+
+```{r my_factorial and my_choose}
+
+my_factorial <- function(n) 
+{
+    n_fac <- 1
+    if (n < 0)
+    {
+        return(NaN)
+    } else if (n != 0) 
+    {
+        for (i in 1:n)
+        {
+            n_fac <- n_fac * i        
+        }
+    }
+    return(n_fac)
+}
+
+my_factorial(-4)
+my_factorial(0)
+my_factorial(1)
+my_factorial(4)
+
+my_choose <- function(n, k)
+{
+    answer <- my_factorial(n)/(my_factorial(n - k) * my_factorial(k))
+    return(answer)
+}
+
+my_choose(5, 3)
+my_choose(10, 2)
+my_choose(4, 1)
+
+```
