@@ -1,0 +1,41 @@
+---
+title: "W4 R Assignment"
+author: "Kyle Gilde"
+date: "August 4, 2016"
+output: html_document
+---
+
+#History of Baseball Data Set
+Original Source: https://www.kaggle.com/kaggle/the-history-of-baseball/downloads/baseball_2016-03-08-22-23-12.zip
+My Source for the player.csv: https://github.com/kylegilde/cuny-r-programming/blob/master/player.csv
+
+
+```{r load data, echo=FALSE}
+require(RCurl)
+myfile <- "https://raw.githubusercontent.com/kylegilde/cuny-r-programming/master/player.csv"
+myURL <- getURL(myfile)
+player <- read.csv(text = myURL, sep = ",")
+sub.player <- na.omit(player)
+head(sub.player)
+str(sub.player)
+```
+
+## Base R Plots
+```{r Base R Plots, echo=FALSE}
+hist(sub.player$weight, main = "Weight Histogram", xlab = "Weight")
+plot(weight ~ height, data = sub.player, main = "Weight as a function of Height")
+boxplot(sub.player$height, ylab = 'Height', main = "Height Boxplot")
+```
+
+## ggplot2
+```{r pressure, echo=FALSE}
+require(ggplot2)
+require(ggthemes)
+ggplot(data = sub.player) + geom_histogram(aes(x = birth_day))  + theme_excel()
+ggplot(data = sub.player, aes(x = height, y = weight)) + geom_point(aes(color = bats)) + facet_wrap(~bats)
+ggplot(data = sub.player, aes(x = bats, y = height)) + geom_boxplot()
+```
+
+## Initial Insights
+There appears to be a mild correlation between a player's height and weight. This relationship persists whether the player bats right-handed, left-handed or both.
+
