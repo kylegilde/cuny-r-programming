@@ -11,86 +11,96 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Load & Re-shape the Data
 
-```{r cars echo=F}
+```{r Load, echo = FALSE}
 require(ggplot2)
 require(ggthemes)
 require(plyr)
 require(hflights)
 my_hflights <- hflights
 
-my_hflights$DayOfWeek[my_hflights$DayOfWeek == 1] <- "1 Sunday"
-my_hflights$DayOfWeek[my_hflights$DayOfWeek == 2] <- "2 Monday"
-my_hflights$DayOfWeek[my_hflights$DayOfWeek == 3] <- "3 Tuesday"
-my_hflights$DayOfWeek[my_hflights$DayOfWeek == 4] <- "4 Wednesday"
-my_hflights$DayOfWeek[my_hflights$DayOfWeek == 5] <- "5 Thursday"
-my_hflights$DayOfWeek[my_hflights$DayOfWeek == 6] <- "6 Friday"
-my_hflights$DayOfWeek[my_hflights$DayOfWeek == 7] <- "7 Saturday"
+#Column name changes
+names(my_hflights)[names(my_hflights)=="UniqueCarrier"] <- "Carrier"
+names(my_hflights)[names(my_hflights)=="DepTime"] <- "DepartureTime"
+names(my_hflights)[names(my_hflights)=="DepDelay"] <- "DepartureDelay"
+names(my_hflights)[names(my_hflights)=="FlightNum"] <- "FlightNumber"
+  
+#Add Strings                               
+# my_hflights$DayOfWeek[my_hflights$DayOfWeek == 1] <- "1 Sunday"
+# my_hflights$DayOfWeek[my_hflights$DayOfWeek == 2] <- "2 Monday"
+# my_hflights$DayOfWeek[my_hflights$DayOfWeek == 3] <- "3 Tuesday"
+# my_hflights$DayOfWeek[my_hflights$DayOfWeek == 4] <- "4 Wednesday"
+# my_hflights$DayOfWeek[my_hflights$DayOfWeek == 5] <- "5 Thursday"
+# my_hflights$DayOfWeek[my_hflights$DayOfWeek == 6] <- "6 Friday"
+# my_hflights$DayOfWeek[my_hflights$DayOfWeek == 7] <- "7 Saturday"
 
-my_hflights$DayOfWeekType <- ifelse(my_hflights$DayOfWeek == "1 Sunday" | my_hflights$DayOfWeek == "7 Saturday", "Weekend", "Weekday")
+#Distinguish between weekend and weekdays
+my_hflights$DayOfWeekType <- ifelse(my_hflights$DayOfWeek %in% c(1, 7), "Weekend", "Weekday")
 
+#add Date column
 my_hflights$Date <- as.Date(ISOdate(my_hflights$Year, my_hflights$Month, my_hflights$DayofMonth))
-my_hflights <- my_hflights[ , !(names(my_hflights) %in% c("Year", "Month", "DayofMonth"))]
 
-my_hflights$DepTime <- my_hflights$DepTime/100
+#Select specific columns & Print a head sample
+my_hflights <- my_hflights[c(23 , 4, 22, 5, 7, 8, 13, 19, 21)]
 
-
-my_hflights <- my_hflights[c(20 , 19,  1:18)]
-
-
-
-
+knitr::kable(head(my_hflights, n = 10), row.names = FALSE)
 str(my_hflights)
-#a.my_hflights <- my_hflights[c(20, 13)]
-
-
 ```
 
 ## Question 1: Were there more flights on certain days of the week?
 
-```{r Question 1, echo=FALSE}
+```{r Question 1, echo = FALSE}
 
 countflights <- table(my_hflights$DayOfWeek)
-barplot(countflights, las = 2, col = "blue",  main = "Number of Flights by Day")
+barplot(countflights, names.arg = c("Sunday", "Monday", "Tuesday", "wednesday", "Thurday", "Friday", "Saturday"),las = 2, col = "blue",  main = "Number of Flights by Day", cex.names=.9)
 ```
 
-I expected there to be more flights on Friday and Saturday, but the histogram shows that there were more flights on Wednesdays, Thursdays and Sundays. 
+### Results: I expected there to be more flights on Friday and Saturday, but the histogram shows that there were more flights on Wednesdays, Thursdays and Sundays. 
 
-## Question 2: Which carriers had the greatest average Departure Delays (sum of DepDelay/# of flights)?
+## Question 2: Which carrier had the greatest average Departure Delay (sum of DepartureDelay / # of flights)?
 
-```{r Question 2}
-sub_hflights <- na.omit(subset(my_hflights, Cancelled + Diverted == 0, select = c(DepDelay, TaxiIn)))
+```{r Question 2, echo = FALSE}
+sub_hflights <- na.omit(subset(my_hflights, Cancelled + Diverted == 0, select = c(Carrier, DepartureDelay, FlightNumber)))
 
-sum_DepDelay <- aggregate(DepDelay ~ UniqueCarrier, my_hflights, sum)
-ct_flights <- aggregate(FlightNum ~ UniqueCarrier, my_hflights, length)
-merge_df <- merge(x = sum_DepDelay, y = ct_flights, by.x = "UniqueCarrier", by.y = "UniqueCarrier")
-merge_df$avg_DepDelay <- merge_df$DepDelay / merge_df$FlightNum
-my_output <- merge_df[order(-merge_df$avg_DepDelay),]
-names(my_output) <- c("Carrier", "Sum of Departure Delay (Minutes)", "Count of Flights", "Avg Departure Delay (Minutes)")
-my_output
+sum_DepartureDelay <- aggregate(DepartureDelay ~ Carrier, sub_hflights, sum)
+
+ct_flights <- aggregate(FlightNumber ~ Carrier, sub_hflights, length)
+
+merge_df <- merge(x = sum_DepartureDelay, y = ct_flights, by.x = "Carrier", by.y = "Carrier")
+
+
+merge_df$avg_DepartureDelay <- merge_df$DepartureDelay / merge_df$FlightNumber
+my_output <- merge_df[order(-merge_df$avg_DepartureDelay),]
+
+names(my_output) <- c("Carrier", "Sum of Departure Delays (Minutes)", "Count of Flights", "Avg Departure Delay (Minutes)")
+knitr::kable(my_output, row.names = FALSE)
 
 
 
 ```
-I used the aggregate, merge and order functions to create this table that shows the WN carrier as having greatest average departure delay at more than 13 minutes.
 
-## Question 3: 
+### Results: I used the aggregate, merge and order functions to create this table that shows the WN carrier as having greatest average departure delay at more than 13 minutes.
 
-```{r Question 3, echo=F}
+## Question 3: Do departure delays accummulate more at certain times of the day?
+
+```{r Question 3, echo=FALSE}
+my_agg <- aggregate(DepartureDelay ~ DepartureTime + Carrier, my_hflights, sum)
+
+ggplot(my_agg, aes(x = DepartureTime, y = DepartureDelay)) + geom_point(aes(color = Carrier)) +labs(title = "Departure Times & Departure Delays", x = "Departure Time", y = "Sum of Departure Delay Minutes") + theme_economist()
+
+str(my_hflights)
 
 #My Notes
 #counts NAs in 1 column and all columns
-sum(is.na(df$x))
-na_count <-sapply(x, function(y) sum(length(which(is.na(y)))))
-
-# Change Characters and Vectors in DFs 
-my_hflights <- lapply(my_hflights, as.character)
-my_hflights <- lapply(my_hflights, factor)
-
-ggplot(na.omit(my_hflights), aes(x=DepDelay, y=Distance)) + geom_point()
-
-
+# sum(is.na(df$x))
+# na_count <-sapply(x, function(y) sum(length(which(is.na(y)))))
+# 
+# # Change Characters and Vectors in DFs 
+# my_hflights <- lapply(my_hflights, as.character)
+# my_hflights <- lapply(my_hflights, factor)
+# 
+# ggplot(na.omit(my_hflights), aes(x=DepartureDelay, y=Distance)) + geom_point()
 
 ```
-
+### Results: Yes, the departure delay minutes appear to increase from the morning to later at night.
 
 
