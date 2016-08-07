@@ -1,0 +1,96 @@
+---
+title: "R Bridge Final Project - Gilde"
+author: "Kyle Gilde"
+date: "August 6, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Load & Re-shape the Data
+
+```{r cars echo=F}
+require(ggplot2)
+require(ggthemes)
+require(plyr)
+require(hflights)
+my_hflights <- hflights
+
+my_hflights$DayOfWeek[my_hflights$DayOfWeek == 1] <- "1 Sunday"
+my_hflights$DayOfWeek[my_hflights$DayOfWeek == 2] <- "2 Monday"
+my_hflights$DayOfWeek[my_hflights$DayOfWeek == 3] <- "3 Tuesday"
+my_hflights$DayOfWeek[my_hflights$DayOfWeek == 4] <- "4 Wednesday"
+my_hflights$DayOfWeek[my_hflights$DayOfWeek == 5] <- "5 Thursday"
+my_hflights$DayOfWeek[my_hflights$DayOfWeek == 6] <- "6 Friday"
+my_hflights$DayOfWeek[my_hflights$DayOfWeek == 7] <- "7 Saturday"
+
+my_hflights$DayOfWeekType <- ifelse(my_hflights$DayOfWeek == "1 Sunday" | my_hflights$DayOfWeek == "7 Saturday", "Weekend", "Weekday")
+
+my_hflights$Date <- as.Date(ISOdate(my_hflights$Year, my_hflights$Month, my_hflights$DayofMonth))
+my_hflights <- my_hflights[ , !(names(my_hflights) %in% c("Year", "Month", "DayofMonth"))]
+
+my_hflights$DepTime <- my_hflights$DepTime/100
+
+
+my_hflights <- my_hflights[c(20 , 19,  1:18)]
+
+
+
+
+str(my_hflights)
+#a.my_hflights <- my_hflights[c(20, 13)]
+
+
+```
+
+## Question 1: Were there more flights on certain days of the week?
+
+```{r Question 1, echo=FALSE}
+
+countflights <- table(my_hflights$DayOfWeek)
+barplot(countflights, las = 2, col = "blue",  main = "Number of Flights by Day")
+```
+
+I expected there to be more flights on Friday and Saturday, but the histogram shows that there were more flights on Wednesdays, Thursdays and Sundays. 
+
+## Question 2: Which carriers had the greatest average Departure Delays (sum of DepDelay/# of flights)?
+
+```{r Question 2}
+sub_hflights <- na.omit(subset(my_hflights, Cancelled + Diverted == 0, select = c(DepDelay, TaxiIn)))
+
+sum_DepDelay <- aggregate(DepDelay ~ UniqueCarrier, my_hflights, sum)
+ct_flights <- aggregate(FlightNum ~ UniqueCarrier, my_hflights, length)
+merge_df <- merge(x = sum_DepDelay, y = ct_flights, by.x = "UniqueCarrier", by.y = "UniqueCarrier")
+merge_df$avg_DepDelay <- merge_df$DepDelay / merge_df$FlightNum
+my_output <- merge_df[order(-merge_df$avg_DepDelay),]
+names(my_output) <- c("Carrier", "Sum of Departure Delay (Minutes)", "Count of Flights", "Avg Departure Delay (Minutes)")
+my_output
+
+
+
+```
+I used the aggregate, merge and order functions to create this table that shows the WN carrier as having greatest average departure delay at more than 13 minutes.
+
+## Question 3: 
+
+```{r Question 3, echo=F}
+
+#My Notes
+#counts NAs in 1 column and all columns
+sum(is.na(df$x))
+na_count <-sapply(x, function(y) sum(length(which(is.na(y)))))
+
+# Change Characters and Vectors in DFs 
+my_hflights <- lapply(my_hflights, as.character)
+my_hflights <- lapply(my_hflights, factor)
+
+ggplot(na.omit(my_hflights), aes(x=DepDelay, y=Distance)) + geom_point()
+
+
+
+```
+
+
+
