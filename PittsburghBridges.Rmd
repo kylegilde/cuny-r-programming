@@ -1,0 +1,48 @@
+---
+title: "Pittsburgh Bridges"
+author: "R Bridge Meetup 3"
+date: "July 28, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+![](http://newsinteractive.post-gazette.com/thedigs/wp-content/uploads/2015/12/WEBDigs.Blimp010.jpg)
+
+## What this code does
+* Load Pittsburgh bridges data from UCI repository into an R data frame.  
+* Select columns related to rivers, lanes, and lengths.  
+* Change code from River = "A" to River = "Allegheny".  In the photo above, the Allegheny is the green colored river feeding into the Ohio; the rust-colored river is the Monongahela.
+
+Very bare bones code, but a reasonable way to start.  Other work that should be done: rename column headers; change codes for other rivers from "O" to "Ohio" and "M" to "Monongahela", etc.
+
+```{r}
+#install.packages("RCurl")
+
+library(RCurl)
+
+url <- "https://archive.ics.uci.edu/ml/machine-learning-databases/bridges/bridges.data.version2"
+
+bridge_data <-getURL(url)
+#getwd()
+bridge_df <- read.csv(text=bridge_data,header=F,sep=",", stringsAsFactors = FALSE)
+#bridge_df
+
+head(bridge_df)
+bridge_df <- bridge_df[,c(2,6,7)]
+
+#View(bridge_df)
+
+# Three rivers are: Allegheny, Monongahela, Ohio
+# Note that to get this code to work, we needed to go back to our read.csv, 
+# and add stringsAsFactors = FALSE
+
+bridge_df$V2[bridge_df$V2=="A"] <- "Allegheny"
+
+#View(bridge_df)
+
+str(bridge_df)
+```
+

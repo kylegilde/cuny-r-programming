@@ -1,0 +1,167 @@
+---
+title: "graphics"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## graphics examples
+
+Based on examples in R Graphics Cookbook
+
+See also: https://www.rstudio.com/wp-content/uploads/2015/12/ggplot2-cheatsheet-2.0.pdf
+
+```{r s, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+#install.packages(c("ggplot2","gcookbook"))
+library(ggplot2)
+library(gcookbook)
+
+data(package="gcookbook")
+data(package="MASS")
+
+vignette(package="ggplot2")
+vignette(package="gcookbook")
+```
+
+## Creating a Histogram
+
+Use histograms to view the distribution of one-dimensional data
+
+```{r}
+str(mtcars)
+#View(mtcars)
+ggplot(mtcars, aes(x=mpg)) + geom_histogram(binwidth=4)
+```
+
+## Creating a Box Plot
+
+box plots compare distributions
+pass in: factor of x values, and vector of y values
+
+```{r}
+
+#View(ToothGrowth)
+
+ggplot(ToothGrowth, aes(x=supp, y=len)) + geom_boxplot()
+
+```
+
+## Making a Basic Scatter Plot
+
+Use geom_point(), and map one variable to x and one to y.
+
+default shape: #16 - solid circles
+default size: 2
+
+
+```{r}
+str(heightweight)
+heightweight[,c("ageYear","heightIn")]
+
+ggplot(heightweight, aes(x=ageYear, y=heightIn)) + geom_point()
+
+```
+
+## Group Data Points by a Variable Using Shape or Color
+
+map the grouping variable to shape or colour
+grouping variable must be categorical (factor or character vector)
+
+```{r}
+heightweight[,c("sex","ageYear","heightIn")]
+ggplot(heightweight, aes(x=ageYear, y=heightIn, shape=sex )) + geom_point()
+ggplot(heightweight, aes(x=ageYear, y=heightIn, colour=sex )) + geom_point()
+
+ggplot(heightweight, aes(x=ageYear, y=heightIn, shape=sex, colour=sex )) + geom_point()
+
+ggplot(heightweight, aes(x=ageYear, y=heightIn, shape=sex, colour=sex )) +
+  geom_point() +
+  scale_shape_manual(values=c(1,2)) +
+  scale_colour_brewer(palette="Set1")
+```
+
+## facets
+
+```{r}
+p <- ggplot(heightweight, aes(x=ageYear, y=heightIn )) + geom_point()
+
+p + facet_grid( sex ~ .)
+
+```
+
+## mpg dataset (included with ggplot2 package)
+```{r}
+dim(mpg)
+str(mpg)
+#View(mpg)
+```
+
+## mtcars dataset (included with base R datasets)
+https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/mtcars.html
+
+```{r}
+dim(mtcars)
+str(mtcars)
+#View(mtcars)
+```
+
+## diamonds dataset (included with ggplot2 package)
+```{r}
+dim(diamonds)
+str(diamonds)
+#View(diamonds)
+```
+
+## Making a Cleveland dot plot
+
+See also: https://www.perceptualedge.com/articles/b-eye/dot_plots.pdf
+
+```{r}
+tophit <- tophitters2001[1:25,c("name","lg","avg")]
+ggplot(tophit,aes(x=avg,y=name)) + geom_point()
+
+ggplot(tophit,aes(x=avg,y=reorder(name,avg))) + geom_point()
+
+ggplot(tophit,aes(x=avg,y=reorder(name,avg))) + geom_point(size=3) +
+  theme_bw() +
+  theme(panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        panel.grid.major.y = element_line(colour="grey60", linetype = "dashed"))
+
+ggplot(tophit,aes(x=reorder(name,avg), y=avg)) + geom_point(size=3) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle=60, hjust=1),
+        panel.grid.major.y = element_blank(),
+        panel.grid.minor.y = element_blank(),
+        panel.grid.major.x = element_line(colour="grey60", linetype = "dashed"))
+
+nameorder <- tophit$name[order(tophit$lg, tophit$avg)]
+
+# turn name into a factor, with levels in the order of nameorder
+tophit$name <- factor(tophit$name, levels=nameorder)
+
+ggplot(tophit, aes(x=avg, y=name)) +
+    geom_segment(aes(yend=name), xend=0, colour="grey50") +
+    geom_point(size=3, aes(colour=lg)) +
+    scale_colour_brewer(palette="Set1", limits=c("NL","AL")) +
+    theme_bw() +
+    theme(panel.grid.major.y = element_blank(),   # No horizontal grid lines
+          legend.position=c(1, 0.55),             # Put legend inside plot area
+          legend.justification=c(1, 0.5))
+
+# using facets
+ggplot(tophit, aes(x=avg, y=name)) +
+    geom_segment(aes(yend=name), xend=0, colour="grey50") +
+    geom_point(size=3, aes(colour=lg)) +
+    scale_colour_brewer(palette="Set1", limits=c("NL","AL"), guide=FALSE) +
+    theme_bw() +
+    theme(panel.grid.major.y = element_blank()) +
+    facet_grid(lg ~ ., scales="free_y", space="free_y")
+  
+```

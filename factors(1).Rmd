@@ -1,0 +1,204 @@
+---
+title: "R Factors"
+author: "Andy Catlin"
+date: "September 10, 2015"
+output: ioslides_presentation
+---
+
+> Sources:
+>   Art of R Programming, Norman Matloff
+>   R Cookbook, Paul Teetor
+>  http://www.cookbook-r.com/Manipulating_data/Changing_the_order_of_levels_of_a_factor/
+
+# factors - overview
+
+#
+
+```{r eval=FALSE}
+x <- c(5,12,13,12)
+x
+str(x)
+xf <- factor(x)
+xf
+str(xf)
+
+attr(xf,"levels")
+levels(xf)
+length(xf)
+x <- c(5,12,13,12)
+
+xff <- factor(x, levels=c(5,12,13,88))
+xff
+
+xff[2] <- 88
+xff
+
+#xff[2] <- 28     # not valid
+
+```
+
+#  What is the default behavior when I load character data?  How do I override this default behavior?
+
+#
+
+```{r eval=FALSE}
+airlines <- read.csv("C:/Data/flights/airlines.csv")
+airlines
+# View(airlines)
+str(airlines)
+
+airlines2 <- read.csv("C:/Data/flights/airlines.csv", as.is = TRUE)
+airlines2
+str(airlines2)
+
+# some functions behave indifferently (or don't work at all) depending on whether you are working with character data or factor data
+
+# nchar(airlines$carrier) # not valid
+nchar(airlines2$carrier)  
+
+airlines2$carrier = as.character(airlines2$carrier)
+str(airlines2$carrier)
+
+airlines2$carrier = as.factor(airlines2$carrier)
+str(airlines2$carrier)
+
+```
+
+
+# How do I change the order of factor levels?
+
+#
+
+```{r eval=FALSE}
+sizes <- factor(c("small", "large", "large", "small", "medium"))
+sizes
+
+sizes <- factor(sizes, levels = c("small", "medium", "large"))
+sizes
+```
+
+# How do I use split() function to group data by factors?
+
+#
+
+```{r eval=FALSE}
+d <- 
+  (list(gender=c("M","M","F","M","F","F"),
+   age=c(47,59,21,32,33,24), income=c(55000,88000,34250,76500,123000,45465)))
+d
+
+split(d$income,d$gender)
+
+d$over25 <- ifelse(d$age > 25, 1, 0)
+d
+split(d$income,list(d$gender,d$over25))
+
+```
+
+# How do I use tapply() to apply a function to every group?
+
+tapply(x,f,g) where x is a vector, f is a factor or list of factors, and g is a function
+
+#
+
+```{r eval=FALSE}
+ages <- c(25, 26, 55, 37, 21, 42)
+affils <- c("R","D","D","R","U","D")
+tapply(ages, affils, mean)
+
+# could also be done with base R aggregate() function
+aggregate(ages,by=list(affils), mean)
+
+# WHAT IS THE DIFFERENCE BETWEEN WHAT IS RETURNED BY tapply() AND BY aggregate()?  WHICH IS FASTER?
+
+```
+
+# How do I use tapply() over more than one set of factors at once?
+
+#
+
+```{r eval=FALSE}
+d <- 
+  (list(gender=c("M","M","F","M","F","F"),
+   age=c(47,59,21,32,33,24), income=c(55000,88000,34250,76500,123000,45465)))
+d
+
+d$over25 <- ifelse(d$age > 25, 1, 0)
+d
+
+tapply(d$income, list(d$gender, d$over25), mean)
+
+```
+
+
+# How do I create a factor from continuous data?  Why would I want to?
+
+binning - splitting data into groups according to intervals
+
+```{r eval=FALSE}
+x <- rnorm(100)
+x
+
+breaks <- c(-3,-2,-1,0,1,2,3)
+f <- cut(x, breaks)
+f
+summary(f)
+
+f <- cut(x, breaks, labels=c("Bottom","Low","Neg","Pos","High","Top"))
+f
+summary(f)
+```
+
+# How do I create a box plot by factor level?
+
+#
+
+```{r eval=FALSE, warning=FALSE}
+#install.packages("MASS")
+library(MASS)
+data(Cars93, package="MASS")
+View(Cars93)
+
+boxplot(Cars93$Horsepower)
+
+```
+
+# Horsepower ~ Origin
+
+#
+
+```{r warning=FALSE}
+library(MASS)
+data(Cars93, package="MASS")
+boxplot(Horsepower ~ Origin, data=Cars93)
+
+```
+
+# How do I create multiple scatterplots, one for each factor level?
+
+conditioning plot - scatterplot with 2+ numeric variables and a factor
+
+```{r warning=FALSE}
+#install.packages("MASS")
+library(MASS)
+data(Cars93, package="MASS")
+# View(Cars93)
+
+coplot(Horsepower ~ MPG.city | Origin, data=Cars93)
+
+```
+
+# TO DO:  For the diamonds dataset in ggplot2 package, what is the average price of a diamond for each cut?
+
+#
+
+```{r warning=FALSE}
+#install.packages("ggplot2")
+library(ggplot2)
+#View(diamonds)
+is.factor(diamonds$cut)
+is.integer(diamonds$cut)
+str(diamonds)
+tapply(diamonds$price, diamonds$cut, mean)
+
+```

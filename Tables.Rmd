@@ -1,0 +1,32 @@
+---
+title: "Untitled"
+author: "Catlin"
+date: "July 18, 2016"
+output: html_document
+---
+
+# showing data
+
+
+```{r cars}
+#install.packages("MASS")
+library(MASS)
+data(package = "MASS")
+head(Cars93)
+View(Cars93)
+
+```
+
+# tables
+
+For nicer tables, consider using knitr's kable function.  Other alternatives:
+
+* xtable. [link](https://cran.r-project.org/web/packages/xtable/vignettes/xtableGallery.pdf)
+* DataTables. [link](http://www.htmlwidgets.org/showcase_leaflet.html)
+
+```{r results='asis'}
+
+knitr::kable(Cars93)
+
+```
+

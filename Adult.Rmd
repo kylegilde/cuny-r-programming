@@ -1,0 +1,53 @@
+---
+title: "Adult"
+author: "R Bridge Meetup 3"
+date: "July 28, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+The Adult dataset in the UCI repository can be used to "predict whether income exceeds $50K/yr based on census data."
+
+Most data science workflows involve loading and subsetting data.  This bare bones code demonstrates a reasonable way to start.
+
+## What this code does
+* Load Adult data from UCI repository into an R data frame.  
+* Select columns related to age, salary, and education
+* Rename the column headers
+
+Alternatively, we could have renamed the columns when we loaded our data, which would have been a little more work (since we rename columns that we subsequently filter out), but would be more readable.
+
+RCurl is a powerful "heavyweight" package for working with web data.  Other approaches include using the read_csv() function in Hadley Wickham's `readr` package.
+
+#Other work that could be done
+* "bin" ages into groups
+* order education factors:  PreSchool < ... < Doctorate
+* how might you visually show the relationships between the 3 variables?
+
+```{r}
+#install.packages("RCurl")
+
+require(RCurl)
+
+url <- "https://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.data"
+
+adult_data <-getURL(url)
+adult_df <- read.csv(text=adult_data,header=F,sep=",")
+
+dim(adult_df)
+head(adult_df)
+str(adult_df)
+
+# include only columns corresponding to age, education, and salary
+adult_df2 <- subset(adult_df,select = c(V1,V4,V15))
+
+head(adult_df2)
+
+colnames(adult_df2) <- c("Age","Education","Salary")
+head(adult_df2)
+
+```
+

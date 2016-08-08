@@ -1,0 +1,71 @@
+---
+title: "Untitled"
+author: "Catlin"
+date: "July 18, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+$E = mc^{2}$
+
+$ax^2 + bx + c = 0$
+
+$\alpha x^2 + \beta x + \gamma = 0$
+
+$x \in A$
+
+\begin{equation} \label{eq1}
+\begin{split}
+A & = \frac{\pi r^2}{2} \\
+ & = \frac{1}{2} \pi r^2
+\end{split}
+\end{equation}
+
+
+$$x = \frac{-b \pm \sqrt{b^2-4ac}}{2a}$$
+
+$$\sqrt{\hphantom{99}}$$
+
+$$\surd$$
+
+The quadratic formula is:
+$x=\frac{-b\pm\sqrt{b^2-4ac}}{2a}$.
+
+
+$$\begin{array}{*{20}c} {x = \frac{{ - b \pm \sqrt {b^2 - 4ac} }}{{2a}}} & {{\rm{when}}} & {ax^2 + bx + c = 0} \\ \end{array}$$
+
+Source: [link](http://equplus.net/eqninfo/Equation-27.html)
+
+
+```{r cars}
+summary(cars)
+
+#install.packages("MASS")
+library(MASS)
+data(package = "MASS")
+View(Cars93)
+class(Cars93)
+```
+
+## tables
+
+```{r results='asis'}
+
+knitr::kable(Cars93)
+
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
