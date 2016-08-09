@@ -23,6 +23,10 @@ names(my_hflights)[names(my_hflights)=="UniqueCarrier"] <- "Carrier"
 names(my_hflights)[names(my_hflights)=="DepTime"] <- "DepartureTime"
 names(my_hflights)[names(my_hflights)=="DepDelay"] <- "DepartureDelay"
 names(my_hflights)[names(my_hflights)=="FlightNum"] <- "FlightNumber"
+
+right = function (string, char){
+substr(string,nchar(string)-(char-1),nchar(string))}
+https://andreacirilloblog.wordpress.com/2014/10/27/excel-right-function-in-r/
   
 #Change DepartureTime to uniform string  
 my_hflights$DepartureTime <- as.character(my_hflights$DepartureTime)
