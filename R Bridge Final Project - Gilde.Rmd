@@ -24,17 +24,6 @@ names(my_hflights)[names(my_hflights)=="DepTime"] <- "DepartureTime"
 names(my_hflights)[names(my_hflights)=="DepDelay"] <- "DepartureDelay"
 names(my_hflights)[names(my_hflights)=="FlightNum"] <- "FlightNumber"
 
-right = function (string, char){
-substr(string,nchar(string)-(char-1),nchar(string))}
-https://andreacirilloblog.wordpress.com/2014/10/27/excel-right-function-in-r/
-  
-#Change DepartureTime to uniform string  
-my_hflights$DepartureTime <- as.character(my_hflights$DepartureTime)
-my_hflights$DepartureTime <- ifelse(nchar(my_hflights$DepartureTime) == 3, paste("0", my_hflights$DepartureTime, sep = ""), my_hflights$DepartureTime)
-my_hflights$DepartureTime <- paste(substr(my_hflights$DepartureTime, 1, 2), ":", substr(my_hflights$DepartureTime, 3, 4), sep = "")
-
-unique(my_hflights$DepartureTime)
-
 #Distinguish between weekend and weekdays
 my_hflights$DayOfWeekType <- ifelse(my_hflights$DayOfWeek %in% c(1, 7), "Weekend", "Weekday")
 
@@ -44,7 +33,7 @@ my_hflights$Date <- as.Date(ISOdate(my_hflights$Year, my_hflights$Month, my_hfli
 #Select specific columns & Print a head sample
 my_hflights <- my_hflights[c(23 , 4, 22, 5, 7, 8, 13, 19, 21)]
 
-knitr::kable(head(my_hflights, n = 10), row.names = FALSE)
+knitr::kable(head(my_hflights), row.names = FALSE)
 #str(my_hflights)
 ```
 
@@ -89,8 +78,7 @@ Avg Departure Delay (Minutes) = Sum of Departure Delays / Count of Flights
 ```{r Question 3, echo=FALSE}
 my_agg <- aggregate(DepartureDelay ~ DepartureTime + Carrier, my_hflights, sum)
 
-ggplot(my_agg, aes(x = DepartureTime, y = DepartureDelay)) + geom_point(aes(color = Carrier))  + labs(title = "Departure Times & Departure Delays", x = "Departure Time", y = "Sum of Departure Delay Minutes") 
-        + scale_x_continuous(breaks = TRUE) + theme_economist()
+ggplot(my_agg, aes(x = DepartureTime, y = DepartureDelay)) + geom_point(aes(color = Carrier))  + labs(title = "Departure Times & Departure Delays", x = "Departure Time", y = "Sum of Departure Delay Minutes") + theme_economist()
 
 #My Notes
 #counts NAs in 1 column and all columns
